@@ -35,32 +35,34 @@ Board::Board(int rows, int cols, int cellSize) : rows(rows), cols(cols), CELL_SI
 void Board::updateBoard(
     sf::RenderWindow* window
 ) {
-    // Draw the board
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            sf::RectangleShape cell(sf::Vector2f(CELL_SIZE - 2, CELL_SIZE - 2));
-            cell.setPosition(j * CELL_SIZE + cols * CELL_SIZE + CELL_SIZE + 1, i * CELL_SIZE + 1); // Slight padding
+    if (showCheats) {
+        // Draw the board
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+                sf::RectangleShape cell(sf::Vector2f(CELL_SIZE - 2, CELL_SIZE - 2));
+                cell.setPosition(j * CELL_SIZE + cols * CELL_SIZE + CELL_SIZE + 1, i * CELL_SIZE + 1); // Slight padding
 
-            if (board[i][j].getContent() == mineType::Mine) {
-                cell.setFillColor(colors.mineColor); // Mine
-            } else {
-                cell.setFillColor(colors.emptyColor); // Empty
-            }
-            window->draw(cell);
-
-            // Draw the mine count
-            if (board[i][j].getContent() == mineType::Empty && board[i][j].mineCount > 0) {
-                sf::Font font;
-                if (!font.loadFromFile("DejaVuSans.ttf")) {
-                    cerr << "Failed to load font!" << endl;
-                    return;
+                if (board[i][j].getContent() == mineType::Mine) {
+                    cell.setFillColor(colors.mineColor); // Mine
+                } else {
+                    cell.setFillColor(colors.emptyColor); // Empty
                 }
-                sf::Text text(to_string(board[i][j].mineCount), font, 16);
-                text.setFillColor(sf::Color::White);
-                text.setPosition(j * CELL_SIZE + cols * CELL_SIZE + CELL_SIZE + 1 + 10, i * CELL_SIZE + 1 + 5);
-                window->draw(text);
-            }
+                window->draw(cell);
 
+                // Draw the mine count
+                if (board[i][j].getContent() == mineType::Empty && board[i][j].mineCount > 0) {
+                    sf::Font font;
+                    if (!font.loadFromFile("DejaVuSans.ttf")) {
+                        cerr << "Failed to load font!" << endl;
+                        return;
+                    }
+                    sf::Text text(to_string(board[i][j].mineCount), font, 16);
+                    text.setFillColor(sf::Color::White);
+                    text.setPosition(j * CELL_SIZE + cols * CELL_SIZE + CELL_SIZE + 1 + 10, i * CELL_SIZE + 1 + 5);
+                    window->draw(text);
+                }
+
+            }
         }
     }
     // Draw the user board
@@ -167,4 +169,9 @@ void Board::checkIfWin(sf::RenderWindow* window){
             winWindow.display();
         }
     }
+}
+
+void Board::setCheats(bool cheats, sf::RenderWindow* window){
+    showCheats = cheats;
+    updateBoard(window);
 }

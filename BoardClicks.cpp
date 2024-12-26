@@ -82,7 +82,7 @@ void Board::handleLeftClick(const sf::Vector2i &mousePosition, sf::RenderWindow*
     }
 }
 
-void Board::handleRightClick(const sf::Vector2i &mousePosition, sf::RenderWindow* window){
+void Board::handleRightClick(const sf::Vector2i &mousePosition){
     // Convert mouse position to grid coordinates
     int col = mousePosition.x / CELL_SIZE;
     int row = mousePosition.y / CELL_SIZE;

@@ -30,13 +30,15 @@ class Board{
         int cols;
         Colors colors;
         int CELL_SIZE = 30;
+        bool showCheats = false;
     public:
         Board(int rows, int cols);
         Board(int rows, int cols, int cellSize);
         void updateBoard(sf::RenderWindow* window);
         void placeMines(int mineCount);
         void handleLeftClick(const sf::Vector2i &mousePosition, sf::RenderWindow* window);
-        void handleRightClick(const sf::Vector2i &mousePosition, sf::RenderWindow* window);
+        void handleRightClick(const sf::Vector2i &mousePosition);
+        void setCheats(bool cheats, sf::RenderWindow* window);
     private:
         void handleZeroCellClick(int row, int col, vector<vector<Cell>> &board);
         void handleCellClick(int row, int col, vector<vector<Cell>> &board);
