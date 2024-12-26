@@ -16,6 +16,7 @@ public:
         Mine
     };
 
+    int mineCount = -1;
     Cell();
 
     void setState(State state);

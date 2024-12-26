@@ -49,8 +49,21 @@ void Board::updateBoard(
             } else {
                 cell.setFillColor(colors.emptyColor); // Empty
             }
-
             window->draw(cell);
+
+            // Draw the mine count
+            if (board[i][j].getContent() == mineType::Empty && board[i][j].mineCount > 0) {
+                sf::Font font;
+                if (!font.loadFromFile("DejaVuSans.ttf")) {
+                    cerr << "Failed to load font!" << endl;
+                    return;
+                }
+                sf::Text text(to_string(board[i][j].mineCount), font, 16);
+                text.setFillColor(sf::Color::White);
+                text.setPosition(j * CELL_SIZE + cols * CELL_SIZE + CELL_SIZE + 1 + 10, i * CELL_SIZE + 1 + 5);
+                window->draw(text);
+            }
+
         }
     }
     // Draw the user board
@@ -72,6 +85,19 @@ void Board::updateBoard(
             }
 
             window->draw(cell);
+
+            // Draw the mine count
+            if (board[i][j].getState() == cellState::Revealed && board[i][j].mineCount > 0) {
+                sf::Font font;
+                if (!font.loadFromFile("DejaVuSans.ttf")) {
+                    cerr << "Failed to load font!" << endl;
+                    return;
+                }
+                sf::Text text(to_string(board[i][j].mineCount), font, 16);
+                text.setFillColor(sf::Color::Black);
+                text.setPosition(j * CELL_SIZE + 10, i * CELL_SIZE + 5);
+                window->draw(text);
+            }
         }
     }
     // Display the board
@@ -88,6 +114,57 @@ void Board::placeMines(int mineCount) {
         if (board[r][c].getContent() == mineType::Empty) {
             board[r][c].setContent(mineType::Mine);
             --mineCount;
+        }
+    }
+
+    // Update the mine count for each cell
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            if (board[i][j].getContent() == mineType::Empty) {
+                int count = 0;
+                for (int r = i - 1; r <= i + 1; ++r) {
+                    for (int c = j - 1; c <= j + 1; ++c) {
+                        if (r >= 0 && r < rows && c >= 0 && c < cols && board[r][c].getContent() == mineType::Mine) {
+                            ++count;
+                        }
+                    }
+                }
+                board[i][j].mineCount = count;
+            }
+        }
+    }
+}
+
+void Board::handleCellClick(int row, int col, vector<vector<Cell>> &board) {
+    if (board[row][col].mineCount == 0) {
+        handleZeroCellClick(row, col, board);
+    } else{
+        // Check if the cell is hidden
+        if (board[row][col].getState() == cellState::Hidden) {
+            // Reveal the cell
+            board[row][col].setState(cellState::Revealed);
+        }
+    }
+}
+
+void Board::handleZeroCellClick(int row, int col, vector<vector<Cell>> &board) {
+    // Check if the cell is hidden
+    if (board[row][col].getState() == cellState::Hidden) {
+        // Reveal the cell
+        board[row][col].setState(cellState::Revealed);
+        if (board[row][col].mineCount == 0) {
+            // Continue revealing neighboring cells
+            for (int r = row - 1; r <= row + 1; ++r) {
+                for (int c = col - 1; c <= col + 1; ++c) {
+                    if (r >= 0 && r < rows && c >= 0 && c < cols) {
+                        if (board[r][c].mineCount == 0 && board[r][c].getState() == cellState::Hidden) {
+                            handleZeroCellClick(r, c, board);
+                        } else if (board[r][c].mineCount > 0 && board[r][c].getState() == cellState::Hidden) {
+                            handleCellClick(r, c, board);
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -126,8 +203,9 @@ void Board::handleLeftClick(const sf::Vector2i &mousePosition, sf::RenderWindow*
                 }
             } else {
                 // Reveal the cell
-                board[row][col].setState(cellState::Revealed);
-                // Continue revealing neigh
+                handleCellClick(row, col, board);
+                updateBoard(window);
+                checkIfWin(window);
             }
         }
     }
@@ -146,6 +224,40 @@ void Board::handleRightClick(const sf::Vector2i &mousePosition, sf::RenderWindow
         } else if (board[row][col].getState() == cellState::Flagged) {
             // Unflag the cell
             board[row][col].setState(cellState::Hidden);
+        }
+    }
+}
+
+void Board::checkIfWin(sf::RenderWindow* window){
+    int hiddenCount = 0;
+    int mineCount = 0;
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            if (board[i][j].getState() == cellState::Hidden) {
+                ++hiddenCount;
+            }
+        }
+    }
+    if (hiddenCount - mineCount == 0) {
+        sf::RenderWindow winWindow(sf::VideoMode(200, 100), "You Win!");
+        while (winWindow.isOpen()) {
+            sf::Event event;
+            while (winWindow.pollEvent(event)) {
+                if (event.type == sf::Event::Closed) {
+                    winWindow.close();
+                    window->close();
+                }
+            }
+            sf::Font font;
+            if (!font.loadFromFile("DejaVuSans.ttf")) {
+                cerr << "Failed to load font!" << endl;
+                return;
+            }
+            sf::Text text("You Win!", font, 24);
+            text.setFillColor(sf::Color::Green);
+            text.setPosition(10, 10);
+            winWindow.draw(text);
+            winWindow.display();
         }
     }
 }

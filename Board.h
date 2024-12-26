@@ -37,6 +37,10 @@ class Board{
         void placeMines(int mineCount);
         void handleLeftClick(const sf::Vector2i &mousePosition, sf::RenderWindow* window);
         void handleRightClick(const sf::Vector2i &mousePosition, sf::RenderWindow* window);
+    private:
+        void handleZeroCellClick(int row, int col, vector<vector<Cell>> &board);
+        void handleCellClick(int row, int col, vector<vector<Cell>> &board);
+        void checkIfWin(sf::RenderWindow* window);
 };
 
 #endif // BOARD_H
