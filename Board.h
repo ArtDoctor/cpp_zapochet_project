@@ -18,11 +18,6 @@ struct Colors {
     sf::Color flagColor = sf::Color(50, 255, 50);    // Green for flagged cells
 };
 
-struct CellSize{
-    int width;
-    int height;
-};
-
 class Board{
     private:
         vector<vector<Cell>> board;

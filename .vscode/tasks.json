@@ -9,7 +9,7 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 "${workspaceFolder}/*.cpp",
-                "-lsfml-graphics",  // Link SFML graphics library
+                "-lsfml-graphics",   // Link SFML graphics library
                 "-lsfml-window",     // Link SFML window library
                 "-lsfml-system",     // Link SFML system library
                 "-o",
