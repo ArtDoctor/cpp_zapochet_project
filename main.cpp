@@ -9,11 +9,10 @@ using namespace std;
 typedef Cell::Content mineType;
 typedef Cell::State cellState;
 
-
 int main() {
-    int rows = 2;    // Number of rows
-    int cols = 2;    // Number of columns
-    int mineCount = 1; // Number of mines
+    int rows = 10;    // Number of rows
+    int cols = 10;    // Number of columns
+    int mineCount = 13; // Number of mines
     int CELL_SIZE = 30; // Size of each cell
     Colors colors;
 
